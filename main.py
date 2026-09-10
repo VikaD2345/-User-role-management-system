@@ -1,8 +1,8 @@
 from datetime import date
 
-# --- Данные пользователя ---
+
 username = "Иванова А.С."
-user_role = "менеджер"          # варианты: администратор, менеджер, сотрудник, гость
+user_role = "менеджер"          
 group_name = "Отдел продаж"
 registration_date = date(2026, 9, 1)
 
