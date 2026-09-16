@@ -1,0 +1,34 @@
+[
+  {
+    "id": 1,
+    "name": "Иванова А.С.",
+    "age": 27,
+    "role_id": 2,
+    "group_id": 1,
+    "registration_date": "2026-09-01"
+  },
+  {
+    "id": 2,
+    "name": "Петров И.К.",
+    "age": 31,
+    "role_id": 3,
+    "group_id": 1,
+    "registration_date": "2026-09-03"
+  },
+  {
+    "id": 3,
+    "name": "Соколова М.В.",
+    "age": 34,
+    "role_id": 1,
+    "group_id": 2,
+    "registration_date": "2026-08-20"
+  },
+  {
+    "id": 4,
+    "name": "Кузнецов Д.А.",
+    "age": 22,
+    "role_id": 3,
+    "group_id": 3,
+    "registration_date": "2026-09-10"
+  }
+]
