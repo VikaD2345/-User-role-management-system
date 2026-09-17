@@ -68,8 +68,10 @@ def resolve_names(
     groups: dict[int, dict],
 ) -> tuple[str, str]:
     """Вернуть названия роли и группы пользователя."""
-    role = roles.get(user.get("role_id"), {})
-    group = groups.get(user.get("group_id"), {})
+    role_id = user.get("role_id")
+    group_id = user.get("group_id")
+    role = roles.get(role_id, {}) if isinstance(role_id, int) else {}
+    group = groups.get(group_id, {}) if isinstance(group_id, int) else {}
     role_name = role.get("name", "не назначена")
     group_name = group.get("name", "без группы")
     return role_name, group_name
@@ -276,12 +278,16 @@ def handle_check_permission(
     for permission in permissions.values():
         print(f"  {permission['code']} — {permission['title']}")
     permission_code = input_nonempty("Код разрешения: ")
-    role = roles.get(user.get("role_id"), {})
+    role_id = user.get("role_id")
+    if not isinstance(role_id, int):
+        print("Роль не назначена.")
+        return
+    role = roles.get(role_id, {})
     role_name = role.get("name", "")
     has_access = role_allows_permission(
         roles,
         permissions,
-        user.get("role_id"),
+        role_id,
         permission_code,
     )
     print(f"Роль: {role_name}")
@@ -382,6 +388,11 @@ def persist(
     save_groups(GROUPS_FILE, groups)
 
 
+def pause() -> None:
+    """Подождать Enter, чтобы результат не скрывался новым меню."""
+    input("\nНажмите Enter, чтобы вернуться в меню...")
+
+
 def main() -> None:
     """Точка запуска приложения: цикл меню и вызов функций проекта."""
     users = load_users(USERS_FILE)
@@ -426,6 +437,8 @@ def main() -> None:
             break
         else:
             print("Нет такого пункта меню. Повторите выбор.")
+        if choice != "0":
+            pause()
 
 
 if __name__ == "__main__":
