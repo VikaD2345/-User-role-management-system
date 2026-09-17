@@ -2,16 +2,29 @@
   {
     "id": 1,
     "name": "администратор",
-    "permission_ids": [1, 2, 3, 4, 5]
+    "permission_ids": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
   },
   {
     "id": 2,
     "name": "менеджер",
-    "permission_ids": [1, 2, 4, 5]
+    "permission_ids": [
+      1,
+      2,
+      4,
+      5
+    ]
   },
   {
     "id": 3,
     "name": "сотрудник",
-    "permission_ids": [1]
+    "permission_ids": [
+      1
+    ]
   }
 ]
