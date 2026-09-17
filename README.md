@@ -60,8 +60,11 @@ python main.py
 ## Запуск тестов
 
 ```
-pytest
+pytest -v
 ```
+
+Файл `pytest.ini` добавляет корень проекта в `pythonpath`, чтобы тесты
+находили модули `users`, `roles`, `groups` и `storage`.
 
 ## Проверка качества кода
 
