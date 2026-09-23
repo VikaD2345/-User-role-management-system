@@ -16,3 +16,4 @@ __pycache__/
 
 # Кэш тестов
 .pytest_cache/
+.mypy_cache/
