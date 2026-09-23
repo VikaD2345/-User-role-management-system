@@ -1,8 +1,12 @@
-"""Загрузка и сохранение данных проекта в JSON-файлах."""
+"""Загрузка и сохранение объектов проекта в JSON-файлах."""
+
+from __future__ import annotations
 
 import json
 import os
 from typing import Any
+
+from models import Group, Permission, Role, User
 
 
 def load_json(filename: str, default: Any) -> Any:
@@ -29,52 +33,87 @@ def save_json(filename: str, data: Any) -> None:
         json.dump(data, file, ensure_ascii=False, indent=2)
 
 
-def _to_dict(items: list[dict]) -> dict[int, dict]:
-    """Преобразовать список записей в словарь по полю id."""
-    result = {}
-    for item in items:
-        result[item["id"]] = item
-    return result
-
-
-def load_users(filename: str) -> dict[int, dict]:
-    """Загрузить пользователей из JSON-файла."""
-    return _to_dict(load_json(filename, []))
-
-
-def save_users(filename: str, users: dict[int, dict]) -> None:
-    """Сохранить пользователей в JSON-файл."""
-    save_json(filename, list(users.values()))
-
-
-def load_roles(filename: str) -> dict[int, dict]:
-    """Загрузить роли из JSON-файла."""
-    return _to_dict(load_json(filename, []))
-
-
-def save_roles(filename: str, roles: dict[int, dict]) -> None:
-    """Сохранить роли в JSON-файл."""
-    save_json(filename, list(roles.values()))
-
-
-def load_permissions(filename: str) -> dict[int, dict]:
-    """Загрузить разрешения из JSON-файла."""
-    return _to_dict(load_json(filename, []))
+def load_permissions(filename: str) -> list[Permission]:
+    """Загрузить разрешения из JSON как объекты Permission."""
+    items = load_json(filename, [])
+    return [Permission.from_data(item) for item in items]
 
 
 def save_permissions(
     filename: str,
-    permissions: dict[int, dict],
+    permissions: list[Permission],
 ) -> None:
-    """Сохранить разрешения в JSON-файл."""
-    save_json(filename, list(permissions.values()))
+    """Сохранить разрешения в JSON."""
+    payload = [
+        {"id": item.id, "code": item.code, "title": item.title}
+        for item in permissions
+    ]
+    save_json(filename, payload)
 
 
-def load_groups(filename: str) -> dict[int, dict]:
-    """Загрузить группы из JSON-файла."""
-    return _to_dict(load_json(filename, []))
+def load_roles(
+    filename: str,
+    permissions: list[Permission],
+) -> list[Role]:
+    """Загрузить роли из JSON как объекты Role."""
+    items = load_json(filename, [])
+    return [Role.from_data(item, permissions) for item in items]
 
 
-def save_groups(filename: str, groups: dict[int, dict]) -> None:
-    """Сохранить группы в JSON-файл."""
-    save_json(filename, list(groups.values()))
+def save_roles(filename: str, roles: list[Role]) -> None:
+    """Сохранить роли в JSON, записывая id разрешений."""
+    payload = [
+        {
+            "id": role.id,
+            "name": role.name,
+            "permission_ids": [item.id for item in role.permissions],
+        }
+        for role in roles
+    ]
+    save_json(filename, payload)
+
+
+def load_groups(filename: str) -> list[Group]:
+    """Загрузить группы из JSON как объекты Group."""
+    items = load_json(filename, [])
+    return [Group.from_data(item) for item in items]
+
+
+def save_groups(filename: str, groups: list[Group]) -> None:
+    """Сохранить группы в JSON."""
+    payload = [
+        {"id": group.id, "name": group.name}
+        for group in groups
+    ]
+    save_json(filename, payload)
+
+
+def load_users(
+    filename: str,
+    roles: list[Role],
+    groups: list[Group],
+) -> list[User]:
+    """Загрузить пользователей и восстановить связи с Role и Group."""
+    users: list[User] = []
+    for item in load_json(filename, []):
+        user = User.from_data(item, roles, groups)
+        if user is not None:
+            users.append(user)
+    return users
+
+
+def save_users(filename: str, users: list[User]) -> None:
+    """Сохранить пользователей, записывая id роли и группы."""
+    payload = []
+    for user in users:
+        payload.append(
+            {
+                "id": user.id,
+                "name": user.name,
+                "age": user.age,
+                "role_id": user.role.id,
+                "group_id": user.group.id if user.group else None,
+                "registration_date": user.registration_date,
+            }
+        )
+    save_json(filename, payload)
