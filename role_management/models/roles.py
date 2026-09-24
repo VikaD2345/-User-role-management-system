@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from models.entity import Entity
-from models.permissions import Permission, find_permission_by_id
+from .entity import Entity
+from .permissions import Permission, find_permission_by_id
 from utils import next_id
 
 

@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from datetime import date
 
-from models.entity import Entity
-from models.groups import Group, find_group_by_id
-from models.roles import Role, find_role_by_id
+from .entity import Entity
+from .groups import Group, find_group_by_id
+from .roles import Role, find_role_by_id
 from utils import next_id
 
 

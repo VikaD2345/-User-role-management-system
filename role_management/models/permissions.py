@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from models.entity import Entity
+from .entity import Entity
 from utils import next_id
 
 

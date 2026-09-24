@@ -4,11 +4,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from models.entity import Entity
+from .entity import Entity
 from utils import next_id
 
 if TYPE_CHECKING:
-    from models.users import User
+    from .users import User
 
 
 class Group(Entity):
