@@ -1,3 +1,5 @@
 [flake8]
-exclude = venv,.venv,__pycache__,.git,.mypy_cache,_build_report.py,_build_pr3_report.py
+exclude = venv,.venv,__pycache__,.git,.mypy_cache,migrations,_build_report.py,_build_pr3_report.py,_build_pr5_report.py
 max-line-length = 79
+per-file-ignores =
+    rolely/settings.py:E501

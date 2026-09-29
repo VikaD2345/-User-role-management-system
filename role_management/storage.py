@@ -9,6 +9,12 @@ from typing import Any
 from models import Group, Permission, Role, User
 
 
+def data_path(filename: str) -> str:
+    """Вернуть путь к JSON-файлу в каталоге data рядом со storage.py."""
+    base = os.path.dirname(os.path.abspath(__file__))
+    return os.path.join(base, "data", filename)
+
+
 def load_json(filename: str, default: Any) -> Any:
     """Загрузить данные из JSON-файла.
 
