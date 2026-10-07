@@ -87,7 +87,7 @@
 - поиск и сортировка.
 
 ## Хранение данных
-JSON-файлы в `role_management/data/`:
+JSON-файлы в `data/`:
 - `users.json`, `roles.json`, `permissions.json`, `groups.json`.
 
 В файлах хранятся `role_id`, `group_id`, `permission_ids`.
@@ -99,7 +99,11 @@ role-management-system/
 ├── README.md
 ├── requirements.txt
 ├── manage.py
+├── main.py
+├── storage.py
+├── utils.py
 ├── rolely/
+│   ├── __init__.py
 │   ├── settings.py
 │   ├── urls.py
 │   ├── asgi.py
@@ -113,13 +117,23 @@ role-management-system/
 ├── groups/
 │   ├── urls.py
 │   └── views.py
-└── role_management/
-    ├── main.py
-    ├── storage.py
-    ├── utils.py
-    ├── models/
-    ├── data/
-    └── tests/
+├── models/
+│   ├── __init__.py
+│   ├── entity.py
+│   ├── users.py
+│   ├── roles.py
+│   ├── permissions.py
+│   └── groups.py
+├── data/
+│   ├── users.json
+│   ├── roles.json
+│   ├── permissions.json
+│   └── groups.json
+└── tests/
+    ├── test_users.py
+    ├── test_roles.py
+    ├── test_groups.py
+    └── test_storage.py
 ```
 
 ## Назначение модулей
@@ -140,8 +154,17 @@ View-функции `roles()` и `role_detail()`. `models.py` пока пуст�
 ### `groups/`
 View-функции `groups()` и `group_detail()`. `models.py` пока пустой.
 
-### `role_management/`
-Консольная версия ПР3: классы, JSON, тесты.
+### `models/`
+Классы предметной области ПР3: `User`, `Role`, `Permission`, `Group`.
+
+### `storage.py` и `utils.py`
+Загрузка JSON и вспомогательный ввод.
+
+### `main.py`
+Консольная версия приложения (сохранена с ПР3).
+
+### `tests/`
+Автоматизированные тесты ПР3.
 
 ## Запуск приложения
 
@@ -163,7 +186,6 @@ python manage.py runserver
 Консольная версия:
 
 ```
-cd role_management
 python main.py
 ```
 
