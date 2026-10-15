@@ -59,6 +59,7 @@ def test_admin_role_can_delete_users() -> None:
     assert "может удалять пользователей" in body
     assert "Соколова М.В." in body
     assert "удаление_пользователей" in body
+    assert "20.08.2026" in body
 
 
 def test_manager_role_cannot_delete_users() -> None:

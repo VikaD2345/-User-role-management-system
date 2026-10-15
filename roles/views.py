@@ -1,5 +1,7 @@
 """View-функции списка и карточки роли."""
 
+from datetime import date, datetime
+
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 
@@ -34,6 +36,15 @@ def _mark_delete_access(role) -> None:
     role.can_delete = role.has_permission(DELETE_USERS)
 
 
+def _as_date(value: date | str | None) -> date | None:
+    """Превратить дату из JSON в date, чтобы сработал фильтр date."""
+    if isinstance(value, date):
+        return value
+    if isinstance(value, str) and value:
+        return datetime.strptime(value, "%Y-%m-%d").date()
+    return None
+
+
 def roles(request: HttpRequest) -> HttpResponse:
     """Страница списка ролей."""
     roles_list, _users = _load_roles_and_users()
@@ -51,6 +62,8 @@ def role_detail(request: HttpRequest, role_id: int) -> HttpResponse:
     if role is not None:
         _mark_delete_access(role)
         members = list(filter_users_by_role(users_list, role))
+        for user in members:
+            user.registration_date = _as_date(user.registration_date)
     context = {"role": role, "members": members}
     return render(
         request,

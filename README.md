@@ -240,7 +240,7 @@ python -m flake8 .
 - `base.html`, `{% extends %}`, `{% block %}`, `{% include %}`;
 - контекст, `{% for %}`, `{% if %}`, `{% empty %}`;
 - именованные URL и пространства имён `homepage`, `roles`, `groups`;
-- фильтры `length` и `default`;
+- фильтры `length`, `default` и `date`;
 - свои CSS, логотип и JavaScript;
 - данные ПР3 по-прежнему из JSON, без Django ORM;
 - обработка 404;

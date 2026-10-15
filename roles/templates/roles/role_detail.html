@@ -42,7 +42,7 @@
             <li>
                 {{ user.name|default:"Без имени" }}
                 — дата регистрации:
-                {{ user.registration_date|default:"не указана" }}
+                {{ user.registration_date|date:"d.m.Y"|default:"не указана" }}
             </li>
             {% empty %}
             <li>нет пользователей с этой ролью</li>
