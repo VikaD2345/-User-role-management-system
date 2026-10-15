@@ -4,7 +4,9 @@ from django.urls import path
 
 from . import views
 
+app_name = "roles"
+
 urlpatterns = [
-    path("", views.roles, name="roles"),
-    path("<int:role_id>/", views.role_detail, name="role_detail"),
+    path("", views.roles, name="list"),
+    path("<int:role_id>/", views.role_detail, name="detail"),
 ]

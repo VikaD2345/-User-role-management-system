@@ -1,0 +1,9 @@
+{% if role.can_delete %}
+<span class="badge bg-success role-access role-access-allowed">
+    может удалять пользователей
+</span>
+{% else %}
+<span class="badge bg-danger role-access role-access-denied">
+    удаление пользователей запрещено
+</span>
+{% endif %}

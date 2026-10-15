@@ -1,8 +1,8 @@
 """View-функции списка и карточки роли."""
 
 from django.http import HttpRequest, HttpResponse
+from django.shortcuts import render
 
-from homepage.views import page
 from models.roles import find_role_by_id
 from models.users import filter_users_by_role
 from storage import (
@@ -12,6 +12,8 @@ from storage import (
     load_roles,
     load_users,
 )
+
+DELETE_USERS = "удаление_пользователей"
 
 
 def _load_roles_and_users() -> tuple:
@@ -27,78 +29,32 @@ def _load_roles_and_users() -> tuple:
     return roles_list, users_list
 
 
+def _mark_delete_access(role) -> None:
+    """Подготовить флаг отображения: шаблон не вызывает метод с аргументом."""
+    role.can_delete = role.has_permission(DELETE_USERS)
+
+
 def roles(request: HttpRequest) -> HttpResponse:
     """Страница списка ролей."""
     roles_list, _users = _load_roles_and_users()
-    items = ""
     for role in roles_list:
-        items += (
-            f'<li class="list-group-item">'
-            f'<a href="/roles/{role.id}/">{role.name}</a>'
-            f" — {role.access_description}"
-            f"</li>"
-        )
-    content = f"""
-    <h1>Роли</h1>
-    <ul class="list-group">{items}</ul>
-    """
-    return HttpResponse(page("Система ролей – роли", content))
+        _mark_delete_access(role)
+    context = {"roles": roles_list}
+    return render(request, "roles/role_list.html", context)
 
 
 def role_detail(request: HttpRequest, role_id: int) -> HttpResponse:
     """Страница одной роли; 404, если роль не найдена."""
     roles_list, users_list = _load_roles_and_users()
     role = find_role_by_id(roles_list, role_id)
-    if role is None:
-        content = """
-        <h1 class="text-danger">Роль не найдена</h1>
-        <a href="/roles/" class="btn btn-outline-secondary">
-            ← к списку ролей
-        </a>
-        """
-        return HttpResponse(
-            page("Роль не найдена", content),
-            status=404,
-        )
-    can_delete = role.has_permission("удаление_пользователей")
-    status = (
-        "может удалять пользователей"
-        if can_delete
-        else "удаление пользователей запрещено"
+    members = []
+    if role is not None:
+        _mark_delete_access(role)
+        members = list(filter_users_by_role(users_list, role))
+    context = {"role": role, "members": members}
+    return render(
+        request,
+        "roles/role_detail.html",
+        context,
+        status=404 if role is None else 200,
     )
-    badge = "bg-success" if can_delete else "bg-danger"
-    codes = sorted(role.permission_codes())
-    codes_text = ", ".join(codes) if codes else "нет"
-    members = list(filter_users_by_role(users_list, role))
-    members_html = ""
-    for user in members:
-        members_html += f"<li>{user.name}</li>"
-    if not members_html:
-        members_html = "<li>нет пользователей с этой ролью</li>"
-    content = f"""
-    <div class="card">
-        <div class="card-body">
-            <h5 class="card-title">{role.name}</h5>
-            <p class="card-text">
-                <strong>ID:</strong> {role.id}
-            </p>
-            <p class="card-text">
-                <strong>Уровень доступа:</strong>
-                {role.access_description}
-            </p>
-            <p class="card-text">
-                <strong>Разрешения:</strong> {codes_text}
-            </p>
-            <p class="card-text">
-                Правило ПР1:
-                <span class="badge {badge}">{status}</span>
-            </p>
-            <p class="card-text"><strong>Пользователи:</strong></p>
-            <ul>{members_html}</ul>
-            <a href="/roles/" class="btn btn-outline-secondary">
-                ← к списку ролей
-            </a>
-        </div>
-    </div>
-    """
-    return HttpResponse(page(role.name, content), status=200)

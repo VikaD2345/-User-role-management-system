@@ -1,8 +1,8 @@
 """View-функции списка и карточки группы."""
 
 from django.http import HttpRequest, HttpResponse
+from django.shortcuts import render
 
-from homepage.views import page
 from models.groups import find_group_by_id, get_group_members
 from storage import (
     data_path,
@@ -26,66 +26,32 @@ def _load_groups_and_users() -> tuple:
     return groups_list, users_list
 
 
+def _mark_member_count(group, users) -> None:
+    """Посчитать участников для шаблона статуса группы."""
+    group.member_count = len(get_group_members(users, group))
+
+
 def groups(request: HttpRequest) -> HttpResponse:
     """Страница списка групп."""
-    groups, users = _load_groups_and_users()
-    items = ""
-    for group in groups:
-        count = len(get_group_members(users, group))
-        items += (
-            f'<li class="list-group-item '
-            f'd-flex justify-content-between">'
-            f'<a href="/groups/{group.id}/">{group.name}</a>'
-            f'<span class="badge bg-success">'
-            f"участников: {count}</span>"
-            f"</li>"
-        )
-    content = f"""
-    <h1>Группы</h1>
-    <ul class="list-group">{items}</ul>
-    """
-    return HttpResponse(page("Система ролей – группы", content))
+    groups_list, users = _load_groups_and_users()
+    for group in groups_list:
+        _mark_member_count(group, users)
+    context = {"groups": groups_list}
+    return render(request, "groups/group_list.html", context)
 
 
 def group_detail(request: HttpRequest, group_id: int) -> HttpResponse:
     """Страница одной группы; 404, если группа не найдена."""
-    groups, users = _load_groups_and_users()
-    group = find_group_by_id(groups, group_id)
-    if group is None:
-        content = """
-        <h1 class="text-danger">Группа не найдена</h1>
-        <a href="/groups/" class="btn btn-outline-secondary">
-            ← к списку групп
-        </a>
-        """
-        return HttpResponse(
-            page("Группа не найдена", content),
-            status=404,
-        )
-    members = get_group_members(users, group)
-    members_html = ""
-    for user in members:
-        members_html += (
-            f"<li>{user.name} — роль: {user.role.name}</li>"
-        )
-    if not members_html:
-        members_html = "<li>в группе пока нет участников</li>"
-    content = f"""
-    <div class="card">
-        <div class="card-body">
-            <h5 class="card-title">{group.name}</h5>
-            <p class="card-text">
-                <strong>ID:</strong> {group.id}
-            </p>
-            <p class="card-text">
-                <strong>Участников:</strong> {len(members)}
-            </p>
-            <p class="card-text"><strong>Состав:</strong></p>
-            <ul>{members_html}</ul>
-            <a href="/groups/" class="btn btn-outline-secondary">
-                ← к списку групп
-            </a>
-        </div>
-    </div>
-    """
-    return HttpResponse(page(group.name, content), status=200)
+    groups_list, users = _load_groups_and_users()
+    group = find_group_by_id(groups_list, group_id)
+    members = []
+    if group is not None:
+        members = get_group_members(users, group)
+        group.member_count = len(members)
+    context = {"group": group, "members": members}
+    return render(
+        request,
+        "groups/group_detail.html",
+        context,
+        status=404 if group is None else 200,
+    )

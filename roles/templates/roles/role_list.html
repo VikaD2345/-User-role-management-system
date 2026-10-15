@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block title %}Роли – Система ролей{% endblock %}
+
+{% block content %}
+<h1>Роли</h1>
+<p>Всего ролей: {{ roles|length }}</p>
+{% for role in roles %}
+    {% include "roles/includes/role_card.html" %}
+{% empty %}
+    <p>Роли не найдены.</p>
+{% endfor %}
+{% endblock %}

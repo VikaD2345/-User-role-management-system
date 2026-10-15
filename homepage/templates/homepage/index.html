@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Главная – Система ролей{% endblock %}
+
+{% block content %}
+<h1 class="display-4">Система ролей</h1>
+<p class="lead">
+    Управление пользователями, ролями и группами.
+</p>
+<p>
+    Веб-интерфейс показывает роли, их разрешения и состав групп.
+    Данные по-прежнему читаются из JSON.
+</p>
+<p>Основные разделы:</p>
+<a href="{% url 'roles:list' %}" class="btn btn-primary me-2">Роли</a>
+<a href="{% url 'groups:groups' %}" class="btn btn-secondary">Группы</a>
+{% endblock %}

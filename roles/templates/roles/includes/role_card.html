@@ -1,0 +1,13 @@
+<article class="card role-card mb-3">
+    <div class="card-body">
+        <h2 class="h5 card-title">
+            {{ role.name|default:"Без названия" }}
+        </h2>
+        <p class="card-text">{{ role.access_description }}</p>
+        {% include "roles/includes/role_access.html" %}
+        <a href="{% url 'roles:detail' role.id %}"
+           class="btn btn-primary mt-3">
+            Подробнее
+        </a>
+    </div>
+</article>

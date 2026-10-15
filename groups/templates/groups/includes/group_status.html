@@ -1,0 +1,9 @@
+{% if group.member_count %}
+<span class="badge bg-success group-status group-status-active">
+    участников: {{ group.member_count }}
+</span>
+{% else %}
+<span class="badge bg-secondary group-status group-status-empty">
+    нет участников
+</span>
+{% endif %}

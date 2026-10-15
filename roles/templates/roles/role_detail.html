@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {% if role %}
+        {{ role.name }} – Система ролей
+    {% else %}
+        Роль не найдена – Система ролей
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+{% if role %}
+<div class="card role-card">
+    <div class="card-body">
+        <h1 class="h3 card-title">
+            {{ role.name|default:"Без названия" }}
+        </h1>
+        <p class="card-text">
+            <strong>ID:</strong> {{ role.id }}
+        </p>
+        <p class="card-text">
+            <strong>Уровень доступа:</strong>
+            {{ role.access_description }}
+        </p>
+        <p class="card-text">
+            <strong>Разрешения:</strong>
+            {% for permission in role.permissions %}
+                {{ permission.code }}{% if not forloop.last %}, {% endif %}
+            {% empty %}
+                нет
+            {% endfor %}
+        </p>
+        <p class="card-text">
+            Правило ПР1:
+            {% include "roles/includes/role_access.html" %}
+        </p>
+        <p class="card-text">
+            <strong>Пользователей:</strong> {{ members|length }}
+        </p>
+        <ul>
+            {% for user in members %}
+            <li>
+                {{ user.name|default:"Без имени" }}
+                — дата регистрации:
+                {{ user.registration_date|default:"не указана" }}
+            </li>
+            {% empty %}
+            <li>нет пользователей с этой ролью</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% else %}
+<h1 class="text-danger">Роль не найдена</h1>
+<p>Роль с указанным идентификатором отсутствует.</p>
+{% endif %}
+<a href="{% url 'roles:list' %}"
+   class="btn btn-outline-secondary mt-3">
+    ← к списку ролей
+</a>
+{% endblock %}

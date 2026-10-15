@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {% if group %}
+        {{ group.name }} – Система ролей
+    {% else %}
+        Группа не найдена – Система ролей
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+{% if group %}
+<div class="card group-card">
+    <div class="card-body">
+        <h1 class="h3 card-title">
+            {{ group.name|default:"Без названия" }}
+        </h1>
+        <p class="card-text">
+            <strong>ID:</strong> {{ group.id }}
+        </p>
+        <p class="card-text">
+            <strong>Статус:</strong>
+            {% include "groups/includes/group_status.html" %}
+        </p>
+        <p class="card-text">
+            <strong>Участников:</strong> {{ members|length }}
+        </p>
+        <ul>
+            {% for user in members %}
+            <li>
+                {{ user.name|default:"Без имени" }}
+                — роль: {{ user.role.name|default:"без роли" }}
+            </li>
+            {% empty %}
+            <li>в группе пока нет участников</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% else %}
+<h1 class="text-danger">Группа не найдена</h1>
+<p>Группа с указанным идентификатором отсутствует.</p>
+{% endif %}
+<a href="{% url 'groups:groups' %}"
+   class="btn btn-outline-secondary mt-3">
+    ← к списку групп
+</a>
+{% endblock %}

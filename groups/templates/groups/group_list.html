@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Группы – Система ролей{% endblock %}
+
+{% block content %}
+<h1>Группы</h1>
+<p>Всего групп: {{ groups|length }}</p>
+{% for group in groups %}
+<article class="card group-card mb-3">
+    <div class="card-body d-flex justify-content-between">
+        <div>
+            <h2 class="h5 card-title">
+                {{ group.name|default:"Без названия" }}
+            </h2>
+            <a href="{% url 'groups:detail' group.id %}">Подробнее</a>
+        </div>
+        {% include "groups/includes/group_status.html" %}
+    </div>
+</article>
+{% empty %}
+<p>Группы не найдены.</p>
+{% endfor %}
+{% endblock %}

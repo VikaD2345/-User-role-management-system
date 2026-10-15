@@ -24,8 +24,10 @@
 ## Используемые технологии
 - Python 3;
 - Django 5.2 — веб-фреймворк;
+- Django Template Language — шаблоны страниц;
 - HTML — разметка страниц;
-- CSS и Bootstrap 5.3 — оформление;
+- CSS, Bootstrap 5.3 и собственный `style.css`;
+- JavaScript — год в подвале страницы;
 - pytest — автоматизированные тесты;
 - flake8 — проверка качества кода.
 
@@ -61,24 +63,33 @@
 Атрибуты: `id`, `name`. Методы: `from_data()`, `__str__()`.
 
 ## Страницы веб-интерфейса
-- `/` — главная, навигация (`index()`);
-- `/roles/` — список ролей из JSON (`roles()`);
-- `/roles/<int:role_id>/` — карточка роли (`role_detail()`);
-- `/groups/` — список групп (`groups()`);
-- `/groups/<int:group_id>/` — карточка группы (`group_detail()`).
+Страницы собирает Django Template Language. Общий каркас —
+`templates/base.html`. Дочерние шаблоны подключают его через
+`{% extends %}`. Навигация вынесена в
+`templates/includes/navigation.html`.
 
-Если роль или группа не найдены, страница возвращает HTTP 404.
+- `/` — главная (`homepage:index`, шаблон `homepage/index.html`);
+- `/roles/` — список ролей (`roles:list`, цикл и карточка
+  `roles/includes/role_card.html`);
+- `/roles/<int:role_id>/` — карточка роли (`roles:detail`);
+- `/groups/` — список групп (`groups:groups`);
+- `/groups/<int:group_id>/` — карточка группы (`groups:detail`).
+
+Если роль или группа не найдены, тот же шаблон карточки показывает
+сообщение, а view возвращает HTTP 404. Ссылки строятся тегом
+`{% url %}`, а не жёстким адресом.
 
 Отдельное приложение пользователей не создаётся: Django уже даёт
 `django.contrib.auth`. Модуль `models/users.py` остаётся в консоли.
 
 ## Основные операции
 
-Используется в вебе (ПР5):
+Используется в вебе (ПР6, шаблоны поверх страниц ПР5):
 - список и карточка роли;
-- проверка права на удаление пользователей (логика ПР1);
+- проверка права на удаление пользователей (логика ПР1, флаг
+  `can_delete` готовится во view);
 - список и карточка группы;
-- состав группы через объекты `User` и `Role`.
+- состав группы через объекты `User` и `Role` (`user.role.name`).
 
 Отложено (есть в консоли, в вебе появятся с формами):
 - добавление пользователя;
@@ -102,6 +113,10 @@ role-management-system/
 ├── main.py
 ├── storage.py
 ├── utils.py
+├── templates/
+│   ├── base.html
+│   └── includes/
+│       └── navigation.html
 ├── rolely/
 │   ├── __init__.py
 │   ├── settings.py
@@ -110,13 +125,20 @@ role-management-system/
 │   └── wsgi.py
 ├── homepage/
 │   ├── urls.py
-│   └── views.py
+│   ├── views.py
+│   ├── static/homepage/
+│   │   ├── css/style.css
+│   │   ├── js/main.js
+│   │   └── img/logo.png
+│   └── templates/homepage/index.html
 ├── roles/
 │   ├── urls.py
-│   └── views.py
+│   ├── views.py
+│   └── templates/roles/
 ├── groups/
 │   ├── urls.py
-│   └── views.py
+│   ├── views.py
+│   └── templates/groups/
 ├── models/
 │   ├── __init__.py
 │   ├── entity.py
@@ -145,8 +167,9 @@ role-management-system/
 Настройки проекта: `settings.py`, корневой `urls.py`.
 
 ### `homepage/`
-Главная страница и функция `page()` — общий HTML-каркас
-(Bootstrap 5.3, CSS, навигация). Остальные приложения её импортируют.
+Главная страница через `render()`. Общий HTML больше не собирается
+функцией `page()`: каркас лежит в `templates/base.html`. Свои CSS,
+JavaScript и логотип — в `homepage/static/homepage/`.
 
 ### `roles/`
 View-функции `roles()` и `role_detail()`. `models.py` пока пустой.
@@ -164,7 +187,7 @@ View-функции `groups()` и `group_detail()`. `models.py` пока пус�
 Консольная версия приложения (сохранена с ПР3).
 
 ### `tests/`
-Автоматизированные тесты ПР3.
+Автоматизированные тесты ПР3 и проверки страниц ПР6.
 
 ## Запуск приложения
 
@@ -212,15 +235,18 @@ python -m flake8 .
 
 ## Текущее состояние и план развития
 
-Реализовано (ПР5):
-- Django-проект `rolely` и приложения `homepage`, `roles`, `groups`;
-- маршрутизация двух уровней;
-- HTML-страницы с Bootstrap;
-- данные ПР3 в веб-интерфейсе;
+Реализовано (ПР6):
+- шаблоны Django вместо сборки HTML в Python;
+- `base.html`, `{% extends %}`, `{% block %}`, `{% include %}`;
+- контекст, `{% for %}`, `{% if %}`, `{% empty %}`;
+- именованные URL и пространства имён `homepage`, `roles`, `groups`;
+- фильтры `length` и `default`;
+- свои CSS, логотип и JavaScript;
+- данные ПР3 по-прежнему из JSON, без Django ORM;
 - обработка 404;
 - консоль и тесты ПР3 сохранены.
 
 Планируется:
-- Django ORM и шаблоны;
 - формы создания и редактирования;
-- база данных, API, Docker, CI/CD.
+- база данных и Django ORM;
+- API, Docker, CI/CD.
